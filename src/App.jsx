@@ -1,122 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import './index.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      {/* Sidebar Component (RF-F02: Modularización en proceso) */}
+      <aside className="sidebar glass-panel">
+        <div className="logo-container">
+          <div className="logo-icon"></div>
+          SmartLogix
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        <nav className="nav-links">
+          {['Dashboard', 'Inventario', 'Pedidos', 'Envíos'].map((item) => (
+            <div 
+              key={item} 
+              className={`nav-item ${activeTab === item.toLowerCase() ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.toLowerCase())}
+            >
+              {item}
+            </div>
+          ))}
+        </nav>
+      </aside>
 
-      <div className="ticks"></div>
+      {/* Main Content Area */}
+      <main className="main-content">
+        <header className="header">
+          <h1>Vista General</h1>
+          <div className="user-profile glass-panel" style={{ padding: '8px 16px', borderRadius: '20px' }}>
+            Admin User
+          </div>
+        </header>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Metrics Grid */}
+        <div className="metrics-grid">
+          <div className="metric-card glass-panel">
+            <span className="metric-title">Pedidos Activos</span>
+            <span className="metric-value">1,284</span>
+            <span className="metric-trend trend-up">↑ 12% vs ayer</span>
+          </div>
+          <div className="metric-card glass-panel">
+            <span className="metric-title">Envíos en Ruta</span>
+            <span className="metric-value">842</span>
+            <span className="metric-trend trend-up">↑ 5% vs ayer</span>
+          </div>
+          <div className="metric-card glass-panel">
+            <span className="metric-title">Alertas de Stock</span>
+            <span className="metric-value" style={{background: 'linear-gradient(to right, #ef4444, #f87171)', WebkitBackgroundClip: 'text'}}>24</span>
+            <span className="metric-trend trend-down">Revisión requerida (Bodega Central)</span>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {/* Placeholder para la integración futura con el BFF */}
+        <div className="glass-panel" style={{ height: '400px', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: '1rem' }}>
+          <h3>Gráfico Interactivo de Operaciones</h3>
+          <p>La integración con <code>/api/v1/inventory</code> y <code>/api/v1/orders</code> vía el BFF Gateway está en desarrollo.</p>
+        </div>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
