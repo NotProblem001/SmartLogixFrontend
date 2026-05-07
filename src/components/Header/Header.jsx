@@ -1,16 +1,41 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { GlassPanel } from '../GlassPanel/GlassPanel';
+import { useAuth } from '../../context/AuthContext';
 
-/**
- * Componente de Encabezado.
- */
-export const Header = ({ title, userName }) => {
+const routeTitles = {
+  '/': 'Dashboard Ejecutivo',
+  '/inventory': 'Inventario',
+  '/orders': 'Pedidos',
+  '/shipping': 'Envíos',
+};
+
+export const Header = ({ title }) => {
+  const location = useLocation();
+  const pageTitle = title || routeTitles[location.pathname] || 'SmartLogix';
+  const { user, logout } = useAuth();
+
   return (
     <header className="header">
-      <h1>{title}</h1>
-      <GlassPanel className="user-profile" style={{ padding: '8px 16px', borderRadius: '20px' }}>
-        {userName}
-      </GlassPanel>
+      <div>
+        <h1>{pageTitle}</h1>
+        <p className="subtitle">Control y visibilidad de la operación logística</p>
+      </div>
+      <div className="header-actions">
+        <GlassPanel className="header-chip">
+          <span>{user?.name || 'Invitado'}</span>
+        </GlassPanel>
+
+        <GlassPanel className="header-chip secondary">
+          <Link to="/shipping">Seguimiento</Link>
+        </GlassPanel>
+
+        <GlassPanel className="header-chip secondary">
+          <button className="ghost-button" onClick={logout}>
+            Cerrar sesión
+          </button>
+        </GlassPanel>
+      </div>
     </header>
   );
 };

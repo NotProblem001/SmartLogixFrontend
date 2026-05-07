@@ -2,41 +2,53 @@ import React from 'react';
 import { MetricCard } from '../../components/MetricCard/MetricCard';
 import { GlassPanel } from '../../components/GlassPanel/GlassPanel';
 
-/**
- * Módulo de la Vista de Dashboard.
- * Utiliza los componentes base para ensamblar la interfaz de usuario específica.
- */
 export const DashboardMetrics = () => {
   return (
     <>
-      {/* Utilización limpia de los componentes aislados */}
       <div className="metrics-grid">
-        <MetricCard 
-          title="Pedidos Activos" 
-          value="1,284" 
-          trend="↑ 12% vs ayer" 
-          trendType="up" 
+        <MetricCard
+          title="Pedidos Pendientes"
+          value="124"
+          trend="↑ 18% en 24h"
+          trendType="up"
         />
-        <MetricCard 
-          title="Envíos en Ruta" 
-          value="842" 
-          trend="↑ 5% vs ayer" 
-          trendType="up" 
-        />
-        <MetricCard 
-          title="Alertas de Stock" 
-          value="24" 
-          trend="Revisión requerida (Bodega Central)" 
-          trendType="down" 
+        <MetricCard
+          title="Stock Crítico"
+          value="38"
+          trend="Revisión prioritaria"
+          trendType="down"
           valueStyle={{ background: 'linear-gradient(to right, #ef4444, #f87171)', WebkitBackgroundClip: 'text' }}
+        />
+        <MetricCard
+          title="Tiempo de Entrega"
+          value="1.8d"
+          trend="Estable"
+          trendType="up"
         />
       </div>
 
-      <GlassPanel 
-        style={{ height: '400px', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: '1rem' }}
+      <GlassPanel
+        style={{
+          height: '320px',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: '1rem',
+          color: 'var(--text-muted)',
+        }}
       >
-        <h3>Gráfico Interactivo de Operaciones</h3>
-        <p>La integración con <code>/api/v1/inventory</code> y <code>/api/v1/orders</code> vía el BFF Gateway está en desarrollo.</p>
+        <div>
+          <h3>Operación Logística</h3>
+          <p>
+            Sonic Gateway listo para enrutar llamadas API centralizadas desde el front-end.
+          </p>
+        </div>
+        <div className="dashboard-summary">
+          <span className="status-pill positive">API Gateway: Activo</span>
+          <span className="status-pill neutral">Circuit Breaker: Listo</span>
+          <span className="status-pill warning">Fallas de transportista: 2 incidentes</span>
+        </div>
       </GlassPanel>
     </>
   );
