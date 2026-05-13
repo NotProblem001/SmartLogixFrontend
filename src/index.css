@@ -4,12 +4,13 @@
   --bg-color: #0f172a; /* Slate 900 */
   --surface-color: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
   --border-color: rgba(255, 255, 255, 0.1);
-  --primary-color: #3b82f6; /* Blue 500 */
-  --primary-glow: rgba(59, 130, 246, 0.5);
+  --primary-color: #1E3A8A; /* Deep Blue */
+  --primary-glow: rgba(30, 58, 138, 0.5);
   --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --accent-green: #10b981;
-  --accent-purple: #8b5cf6;
+  --text-muted: #64748B; /* Slate Gray */
+  --accent-green: #10B981; /* Emerald Green */
+  --accent-warning: #F59E0B; /* Amber */
+  --accent-danger: #E11D48; /* Rose Red */
 }
 
 * {
@@ -161,3 +162,21 @@ body {
 
 .trend-up { color: var(--accent-green); }
 .trend-down { color: #ef4444; }
+
+/* Accesibilidad (A11y) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+}

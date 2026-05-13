@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import InventoryService from '../../services/InventoryService';
+import InventoryTable from '../../components/InventoryTable/InventoryTable';
+import FloatingActionBar from '../../components/FloatingActionBar/FloatingActionBar';
 import './InventoryDashboard.css';
 
 const InventoryDashboard = () => {
   const [stock, setStock] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     fetchStock();
@@ -50,9 +53,26 @@ const InventoryDashboard = () => {
     if (!window.confirm('¿Eliminar producto?')) return;
     try {
       await InventoryService.deleteStock(id);
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
       await fetchStock();
     } catch (err) {
       console.error('Error al eliminar', err);
+    }
+  };
+
+  const handleDeleteMultiple = async () => {
+    if (!window.confirm(`¿Eliminar ${selectedIds.length} productos seleccionados?`)) return;
+    try {
+      setLoading(true);
+      // Batch delete
+      for (const id of selectedIds) {
+        await InventoryService.deleteStock(id);
+      }
+      setSelectedIds([]);
+      await fetchStock();
+    } catch (err) {
+      console.error('Error al eliminar múltiple', err);
+      setLoading(false);
     }
   };
 
@@ -67,15 +87,6 @@ const InventoryDashboard = () => {
       }
     }
   };
-
-  if (loading) {
-    return (
-      <div className="dashboard-loading">
-        <div className="spinner"></div>
-        <p>Sincronizando inventario...</p>
-      </div>
-    );
-  }
 
   const filteredStock = stock.filter(item => 
     (item.productSku && item.productSku.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -125,35 +136,45 @@ const InventoryDashboard = () => {
         </form>
       )}
 
-      {filteredStock.length === 0 ? (
+      {loading && stock.length === 0 ? (
+        <div className="dashboard-loading">
+          <div className="spinner"></div>
+          <p>Sincronizando inventario...</p>
+        </div>
+      ) : filteredStock.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">📦</div>
           <h3>No se encontraron productos</h3>
           <p>La búsqueda no coincide con ningún registro o el inventario está vacío.</p>
         </div>
       ) : (
-        <div className="inventory-grid">
-          {filteredStock.map((item) => (
-            <div key={item.id} className="inventory-card">
-              <div className="card-header">
-                <h3>{`Producto #${item.id}`}</h3>
-                <span className="sku-badge">{item.productSku || 'N/A'}</span>
-              </div>
-              <div className="card-body">
-                <div className="stock-info">
-                  <span className="stock-label">Stock Total</span>
-                  <span className={`stock-value ${item.availableQuantity > 10 ? 'healthy' : 'low'}`}>
-                    {item.availableQuantity}
-                  </span>
-                </div>
-                <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                  <button className="btn-action edit" onClick={() => handleEdit(item.id, item.availableQuantity)}>✏️</button>
-                  <button className="btn-action delete" onClick={() => handleDelete(item.id)}>🗑️</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <>
+          <InventoryTable 
+            stock={filteredStock} 
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+          
+          <FloatingActionBar 
+            selectedCount={selectedIds.length}
+            onClearSelection={() => setSelectedIds([])}
+            actions={[
+              {
+                label: 'Sincronizar Stock',
+                icon: '↻',
+                onClick: fetchStock
+              },
+              {
+                label: 'Eliminar Seleccionados',
+                icon: '🗑️',
+                className: 'danger',
+                onClick: handleDeleteMultiple
+              }
+            ]}
+          />
+        </>
       )}
     </div>
   );

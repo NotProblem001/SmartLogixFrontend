@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OrderService from '../../services/OrderService';
+import '../../components/InventoryTable/InventoryTable.css';
 import './OrderDashboard.css';
 
 const OrderDashboard = () => {
@@ -115,37 +116,60 @@ const OrderDashboard = () => {
         {filteredOrders.length === 0 && !loading ? (
           <p className="empty-state">No hay pedidos que coincidan con la búsqueda.</p>
         ) : (
-          <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <th style={{ padding: '1rem 0' }}>ID Pedido</th>
-                <th>Cliente ID</th>
-                <th>SKU Solicitado</th>
-                <th>Cantidad</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <td style={{ padding: '1rem 0' }}>#{order.id}</td>
-                  <td>{order.customerId}</td>
-                  <td>{order.sku || 'N/A'}</td>
-                  <td>{order.quantity || 0}</td>
-                  <td>
-                    <span className={`status-badge status-${order.status?.toLowerCase() || 'pending'}`} style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
-                      {order.status || 'PENDING'}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="btn-action edit" onClick={() => handleEdit(order.id, order.status)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', marginRight: '0.5rem' }}>✏️</button>
-                    <button className="btn-action delete" onClick={() => handleDelete(order.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>🗑️</button>
-                  </td>
+          <div className="inventory-table-container">
+            <table className="inventory-table" role="grid">
+              <thead>
+                <tr>
+                  <th>ID Pedido</th>
+                  <th>Cliente ID</th>
+                  <th>SKU Solicitado</th>
+                  <th>Cantidad</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order) => {
+                  const statusColors = {
+                    'PENDING': 'badge-warning',
+                    'COMPLETED': 'badge-success',
+                    'CANCELLED': 'text-danger' // Just red text or another badge
+                  };
+                  const badgeClass = statusColors[order.status?.toUpperCase()] || 'badge-warning';
+
+                  return (
+                    <tr key={order.id}>
+                      <td>#{order.id}</td>
+                      <td>{order.customerId}</td>
+                      <td className="font-mono">{order.sku || 'N/A'}</td>
+                      <td className="font-bold">{order.quantity || 0}</td>
+                      <td>
+                        <span className={`status-badge ${badgeClass}`}>
+                          {order.status || 'PENDING'}
+                        </span>
+                      </td>
+                      <td className="actions-cell">
+                        <button 
+                          className="btn-icon" 
+                          onClick={() => handleEdit(order.id, order.status)} 
+                          title="Editar Estado"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className="btn-icon text-danger" 
+                          onClick={() => handleDelete(order.id)} 
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
