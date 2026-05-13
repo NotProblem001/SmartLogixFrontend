@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { Header } from '../components/Header/Header';
 import '../index.css';
 
 /**
  * Layout principal orquestador.
- * Utiliza los componentes visuales puros (Sidebar, Header).
  */
 export const DashboardLayout = ({ children }) => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const navItems = ['Dashboard', 'Inventario', 'Pedidos', 'Envíos'];
+  const navItems = [
+    { name: 'Dashboard', path: '/' },
+    { name: 'Inventario', path: '/inventory' },
+    { name: 'Pedidos', path: '/orders' },
+    { name: 'Envíos', path: '/shipping' }
+  ];
 
   return (
     <div className="app-container">
-      <Sidebar 
-        navItems={navItems} 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
-      />
+      <Sidebar navItems={navItems} />
       
       <main className="main-content">
-        <Header title="Vista General" userName="Admin User" />
+        <Header title="Panel de Control" userName="Admin User" />
         {children}
       </main>
     </div>

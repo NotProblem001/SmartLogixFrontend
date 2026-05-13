@@ -1,11 +1,11 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { GlassPanel } from '../GlassPanel/GlassPanel';
 
 /**
- * Componente de Navegación (Organismo).
- * Totalmente agnóstico: Recibe las rutas y la función de clickeado como props.
+ * Componente de Navegación con react-router-dom.
  */
-export const Sidebar = ({ navItems, activeTab, onTabChange }) => {
+export const Sidebar = ({ navItems }) => {
   return (
     <GlassPanel className="sidebar" style={{ borderRadius: '0' }}>
       <div className="logo-container">
@@ -14,13 +14,13 @@ export const Sidebar = ({ navItems, activeTab, onTabChange }) => {
       </div>
       <nav className="nav-links">
         {navItems.map((item) => (
-          <div 
-            key={item} 
-            className={`nav-item ${activeTab === item.toLowerCase() ? 'active' : ''}`}
-            onClick={() => onTabChange(item.toLowerCase())}
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
-            {item}
-          </div>
+            {item.name}
+          </NavLink>
         ))}
       </nav>
     </GlassPanel>

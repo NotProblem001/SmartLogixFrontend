@@ -68,7 +68,7 @@ pnpm install
 
 3. **Iniciar servidor de desarrollo:**
 ```bash
-pnpm run dev
+pnpm run dev "or" npm.cmd run dev
 
 ```
 
