@@ -16,19 +16,21 @@ const OrderService = {
     }
   },
 
-  /**
-   * Obtiene la lista de pedidos.
-   * @returns {Promise<Array>} Lista de pedidos.
-   */
-  getOrders: async () => {
-    try {
-      const response = await api.get('/orders');
-      return response.data;
-    } catch (error) {
-      console.error('Error al obtener los pedidos', error);
-      throw error;
-    }
-  }
+  getAllOrders: async () => {
+    const response = await api.get('/orders');
+    return response.data;
+  },
+
+  updateOrder: async (id, orderData) => {
+    const response = await api.put(`/orders/${id}`, orderData);
+    return response.data;
+  },
+
+  deleteOrder: async (id) => {
+    const response = await api.delete(`/orders/${id}`);
+    return response.data;
+  },
+
 };
 
 export default OrderService;

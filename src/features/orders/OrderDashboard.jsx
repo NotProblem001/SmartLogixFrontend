@@ -7,6 +7,8 @@ const OrderDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -15,7 +17,7 @@ const OrderDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await OrderService.getOrders();
+      const data = await OrderService.getAllOrders();
       setOrders(data);
     } catch (err) {
       setError('No se pudieron cargar los pedidos. Verifique la conexión.');
@@ -27,16 +29,46 @@ const OrderDashboard = () => {
   const handleCreateOrder = async () => {
     try {
       setLoading(true);
+      // Simular un pedido que descuenta un producto (ej. SKU DEMO-XXX)
+      const sku = window.prompt("Introduce el SKU del producto a pedir:", "DEMO-123");
+      if (!sku) {
+        setLoading(false);
+        return;
+      }
+      
       const newOrder = {
-        customerId: 1,
-        items: [{ productId: 101, quantity: 2 }]
+        customerId: Math.floor(Math.random() * 100),
+        sku: sku,
+        warehouseId: 1,
+        quantity: 1
       };
       await OrderService.createOrder(newOrder);
-      // Recargar la lista después de crear
       await fetchOrders();
     } catch (err) {
-      setError('Error al crear el pedido.');
+      setError('Error al crear el pedido o stock insuficiente.');
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm(`¿Eliminar pedido #${id}?`)) return;
+    try {
+      await OrderService.deleteOrder(id);
+      await fetchOrders();
+    } catch (err) {
+      setError('Error al eliminar el pedido.');
+    }
+  };
+
+  const handleEdit = async (id, currentStatus) => {
+    const newStatus = window.prompt('Nuevo estado del pedido:', currentStatus);
+    if (newStatus) {
+      try {
+        await OrderService.updateOrder(id, { status: newStatus });
+        await fetchOrders();
+      } catch (err) {
+        setError('Error al actualizar el estado.');
+      }
     }
   };
 
@@ -49,46 +81,67 @@ const OrderDashboard = () => {
     );
   }
 
+  const filteredOrders = orders.filter(order => 
+    order.id.toString().includes(searchTerm) || 
+    (order.status && order.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (order.sku && order.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   return (
     <div className="order-dashboard-container glass-panel">
       <header className="order-header">
         <h2>Panel de Pedidos</h2>
-        <button className="btn-primary" onClick={handleCreateOrder} disabled={loading}>
-          {loading ? 'Procesando...' : 'Crear Pedido de Prueba'}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="text" 
+            placeholder="Buscar por ID, SKU o Estado..." 
+            className="filter-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className="btn-primary" onClick={handleCreateOrder} disabled={loading}>
+            {loading ? 'Procesando...' : '+ Crear Pedido Manual'}
+          </button>
+        </div>
       </header>
 
       {error && (
-        <div className="alert alert-error">
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>×</button>
+        <div className="alert alert-error" style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', borderRadius: '8px' }}>
+          <p style={{ margin: 0 }}>{error}</p>
         </div>
       )}
 
       <div className="order-list">
-        {orders.length === 0 && !loading && !error ? (
-          <p className="empty-state">No hay pedidos registrados.</p>
+        {filteredOrders.length === 0 && !loading ? (
+          <p className="empty-state">No hay pedidos que coincidan con la búsqueda.</p>
         ) : (
-          <table>
+          <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
             <thead>
-              <tr>
-                <th>ID Pedido</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <th style={{ padding: '1rem 0' }}>ID Pedido</th>
                 <th>Cliente ID</th>
+                <th>SKU Solicitado</th>
+                <th>Cantidad</th>
                 <th>Estado</th>
-                <th>Total</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td>#{order.id}</td>
+              {filteredOrders.map((order) => (
+                <tr key={order.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '1rem 0' }}>#{order.id}</td>
                   <td>{order.customerId}</td>
+                  <td>{order.sku || 'N/A'}</td>
+                  <td>{order.quantity || 0}</td>
                   <td>
-                    <span className={`status-badge status-${order.status?.toLowerCase() || 'pending'}`}>
+                    <span className={`status-badge status-${order.status?.toLowerCase() || 'pending'}`} style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
                       {order.status || 'PENDING'}
                     </span>
                   </td>
-                  <td>${order.total || '0.00'}</td>
+                  <td>
+                    <button className="btn-action edit" onClick={() => handleEdit(order.id, order.status)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', marginRight: '0.5rem' }}>✏️</button>
+                    <button className="btn-action delete" onClick={() => handleDelete(order.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>🗑️</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

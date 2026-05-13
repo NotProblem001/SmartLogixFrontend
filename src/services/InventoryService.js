@@ -43,6 +43,16 @@ const InventoryService = {
       console.error('Error al crear stock', error);
       throw error;
     }
+  },
+
+  updateStock: async (id, stockData) => {
+    const response = await api.put(`/inventory/${id}`, stockData);
+    return response.data;
+  },
+
+  deleteStock: async (id) => {
+    const response = await api.delete(`/inventory/${id}`);
+    return response.data;
   }
 };
 
