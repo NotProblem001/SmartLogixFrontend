@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import InventoryService from '../../services/InventoryService';
 import InventoryTable from '../../components/InventoryTable/InventoryTable';
 import FloatingActionBar from '../../components/FloatingActionBar/FloatingActionBar';
+import InventoryForm from '../../components/Forms/InventoryForm';
 import './InventoryDashboard.css';
 
 const InventoryDashboard = () => {
@@ -9,6 +10,7 @@ const InventoryDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     fetchStock();
@@ -22,29 +24,6 @@ const InventoryDashboard = () => {
     } catch (err) {
       console.error('Error al cargar inventario', err);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const [isAdding, setIsAdding] = useState(false);
-  const [newProduct, setNewProduct] = useState({ sku: '', quantity: '' });
-
-  const handleCreateSubmit = async (e) => {
-    e.preventDefault();
-    if (!newProduct.sku || !newProduct.quantity) return;
-    
-    try {
-      setLoading(true);
-      const payload = {
-        productSku: newProduct.sku,
-        availableQuantity: parseInt(newProduct.quantity)
-      };
-      await InventoryService.createStock(payload);
-      setNewProduct({ sku: '', quantity: '' });
-      setIsAdding(false);
-      await fetchStock();
-    } catch (err) {
-      console.error('Error insertando producto', err);
       setLoading(false);
     }
   };
@@ -64,7 +43,6 @@ const InventoryDashboard = () => {
     if (!window.confirm(`¿Eliminar ${selectedIds.length} productos seleccionados?`)) return;
     try {
       setLoading(true);
-      // Batch delete
       for (const id of selectedIds) {
         await InventoryService.deleteStock(id);
       }
@@ -77,7 +55,7 @@ const InventoryDashboard = () => {
   };
 
   const handleEdit = async (id, currentQty) => {
-    const newQty = window.prompt('Nueva cantidad:', currentQty);
+    const newQty = window.prompt('Nueva cantidad disponible:', currentQty);
     if (newQty && !isNaN(newQty)) {
       try {
         await InventoryService.updateStock(id, { availableQuantity: parseInt(newQty) });
@@ -104,37 +82,14 @@ const InventoryDashboard = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="btn-primary" onClick={() => setIsAdding(!isAdding)}>
-            {isAdding ? 'Cancelar' : '+ Añadir'}
+          <button className="btn-primary" onClick={() => setIsFormOpen(true)}>
+            + Añadir
           </button>
           <button className="btn-secondary" onClick={fetchStock}>
             ↻ Sincronizar
           </button>
         </div>
       </div>
-
-      {isAdding && (
-        <form onSubmit={handleCreateSubmit} className="add-product-form" style={{ display: 'flex', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '1rem' }}>
-          <input 
-            type="text" 
-            placeholder="SKU del Producto" 
-            required
-            className="filter-input"
-            value={newProduct.sku}
-            onChange={(e) => setNewProduct({...newProduct, sku: e.target.value})}
-          />
-          <input 
-            type="number" 
-            placeholder="Cantidad Inicial" 
-            required
-            min="1"
-            className="filter-input"
-            value={newProduct.quantity}
-            onChange={(e) => setNewProduct({...newProduct, quantity: e.target.value})}
-          />
-          <button type="submit" className="btn-primary">Guardar</button>
-        </form>
-      )}
 
       {loading && stock.length === 0 ? (
         <div className="dashboard-loading">
@@ -176,6 +131,12 @@ const InventoryDashboard = () => {
           />
         </>
       )}
+
+      <InventoryForm 
+        isOpen={isFormOpen} 
+        onClose={() => setIsFormOpen(false)} 
+        onSuccess={fetchStock} 
+      />
     </div>
   );
 };

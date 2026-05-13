@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OrderService from '../../services/OrderService';
+import OrderForm from '../../components/Forms/OrderForm';
 import '../../components/InventoryTable/InventoryTable.css';
 import './OrderDashboard.css';
 
@@ -7,7 +8,7 @@ const OrderDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -23,30 +24,6 @@ const OrderDashboard = () => {
     } catch (err) {
       setError('No se pudieron cargar los pedidos. Verifique la conexión.');
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateOrder = async () => {
-    try {
-      setLoading(true);
-      // Simular un pedido que descuenta un producto (ej. SKU DEMO-XXX)
-      const sku = window.prompt("Introduce el SKU del producto a pedir:", "DEMO-123");
-      if (!sku) {
-        setLoading(false);
-        return;
-      }
-      
-      const newOrder = {
-        customerId: Math.floor(Math.random() * 100),
-        sku: sku,
-        warehouseId: 1,
-        quantity: 1
-      };
-      await OrderService.createOrder(newOrder);
-      await fetchOrders();
-    } catch (err) {
-      setError('Error al crear el pedido o stock insuficiente.');
       setLoading(false);
     }
   };
@@ -73,15 +50,6 @@ const OrderDashboard = () => {
     }
   };
 
-  if (loading && orders.length === 0) {
-    return (
-      <div className="order-dashboard-loading">
-        <div className="spinner"></div>
-        <p>Cargando información de pedidos...</p>
-      </div>
-    );
-  }
-
   const filteredOrders = orders.filter(order => 
     order.id.toString().includes(searchTerm) || 
     (order.status && order.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -100,8 +68,8 @@ const OrderDashboard = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="btn-primary" onClick={handleCreateOrder} disabled={loading}>
-            {loading ? 'Procesando...' : '+ Crear Pedido Manual'}
+          <button className="btn-primary" onClick={() => setIsFormOpen(true)}>
+            + Crear Pedido Manual
           </button>
         </div>
       </header>
@@ -113,7 +81,12 @@ const OrderDashboard = () => {
       )}
 
       <div className="order-list">
-        {filteredOrders.length === 0 && !loading ? (
+        {loading && orders.length === 0 ? (
+          <div className="order-dashboard-loading">
+            <div className="spinner"></div>
+            <p>Cargando información de pedidos...</p>
+          </div>
+        ) : filteredOrders.length === 0 ? (
           <p className="empty-state">No hay pedidos que coincidan con la búsqueda.</p>
         ) : (
           <div className="inventory-table-container">
@@ -172,6 +145,12 @@ const OrderDashboard = () => {
           </div>
         )}
       </div>
+
+      <OrderForm 
+        isOpen={isFormOpen} 
+        onClose={() => setIsFormOpen(false)} 
+        onSuccess={fetchOrders} 
+      />
     </div>
   );
 };
