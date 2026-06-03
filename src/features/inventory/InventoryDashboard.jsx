@@ -8,6 +8,7 @@ import './InventoryDashboard.css';
 const InventoryDashboard = () => {
   const [stock, setStock] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -19,10 +20,12 @@ const InventoryDashboard = () => {
   const fetchStock = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await InventoryService.getSyncedStock();
       setStock(data);
     } catch (err) {
       console.error('Error al cargar inventario', err);
+      setError('Error al cargar el inventario. Verifique la conexión.');
     } finally {
       setLoading(false);
     }
@@ -31,11 +34,13 @@ const InventoryDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar producto?')) return;
     try {
+      setError(null);
       await InventoryService.deleteStock(id);
       setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
       await fetchStock();
     } catch (err) {
       console.error('Error al eliminar', err);
+      setError('Error al eliminar el producto.');
     }
   };
 
@@ -43,6 +48,7 @@ const InventoryDashboard = () => {
     if (!window.confirm(`¿Eliminar ${selectedIds.length} productos seleccionados?`)) return;
     try {
       setLoading(true);
+      setError(null);
       for (const id of selectedIds) {
         await InventoryService.deleteStock(id);
       }
@@ -50,6 +56,7 @@ const InventoryDashboard = () => {
       await fetchStock();
     } catch (err) {
       console.error('Error al eliminar múltiple', err);
+      setError('Error al eliminar los productos seleccionados.');
       setLoading(false);
     }
   };
@@ -58,10 +65,12 @@ const InventoryDashboard = () => {
     const newQty = window.prompt('Nueva cantidad disponible:', currentQty);
     if (newQty && !isNaN(newQty)) {
       try {
+        setError(null);
         await InventoryService.updateStock(id, { availableQuantity: parseInt(newQty) });
         await fetchStock();
       } catch (err) {
         console.error('Error al actualizar', err);
+        setError('Error al actualizar la cantidad del producto.');
       }
     }
   };
@@ -90,6 +99,12 @@ const InventoryDashboard = () => {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="alert alert-error" style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', borderRadius: '8px' }}>
+          <p style={{ margin: 0 }}>{error}</p>
+        </div>
+      )}
 
       {loading && stock.length === 0 ? (
         <div className="dashboard-loading">

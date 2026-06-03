@@ -5,6 +5,7 @@ import './ShippingDashboard.css';
 const ShippingDashboard = () => {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [fallbackMsg, setFallbackMsg] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -15,6 +16,7 @@ const ShippingDashboard = () => {
   const fetchShipments = async () => {
     try {
       setLoading(true);
+      setError(null);
       setFallbackMsg(null);
       const data = await ShippingService.getShipments();
       
@@ -26,6 +28,7 @@ const ShippingDashboard = () => {
       }
     } catch (err) {
       console.error('Error en fetchShipments', err);
+      setError('Error al consultar los envíos. Verifique la conexión.');
     } finally {
       setLoading(false);
     }
@@ -33,6 +36,7 @@ const ShippingDashboard = () => {
 
   const handleCreate = async () => {
     try {
+      setError(null);
       const orderId = window.prompt("ID del pedido a enviar:", "101");
       if (!orderId) return;
       
@@ -45,6 +49,7 @@ const ShippingDashboard = () => {
       await fetchShipments();
     } catch (err) {
       console.error("Error creando envío", err);
+      setError('Error al crear el envío.');
     }
   };
 
@@ -52,10 +57,12 @@ const ShippingDashboard = () => {
     const newStatus = window.prompt("Actualizar estado del envío:", currentStatus);
     if (newStatus) {
       try {
+        setError(null);
         await ShippingService.updateShipment(id, { status: newStatus });
         await fetchShipments();
       } catch (err) {
         console.error("Error actualizando envío", err);
+        setError('Error al actualizar el envío.');
       }
     }
   };
@@ -63,10 +70,12 @@ const ShippingDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm(`¿Cancelar envío #${id}?`)) return;
     try {
+      setError(null);
       await ShippingService.deleteShipment(id);
       await fetchShipments();
     } catch (err) {
       console.error("Error eliminando envío", err);
+      setError('Error al eliminar el envío.');
     }
   };
 
@@ -105,6 +114,12 @@ const ShippingDashboard = () => {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="alert alert-error" style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', borderRadius: '8px' }}>
+          <p style={{ margin: 0 }}>{error}</p>
+        </div>
+      )}
 
       {fallbackMsg && (
         <div className="fallback-alert">
