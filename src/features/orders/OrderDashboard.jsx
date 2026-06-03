@@ -50,8 +50,8 @@ const OrderDashboard = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => 
-    order.id.toString().includes(searchTerm) || 
+  const filteredOrders = orders.filter(order =>
+    order.id.toString().includes(searchTerm) ||
     (order.status && order.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (order.sku && order.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -61,9 +61,9 @@ const OrderDashboard = () => {
       <header className="order-header">
         <h2>Panel de Pedidos</h2>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <input 
-            type="text" 
-            placeholder="Buscar por ID, SKU o Estado..." 
+          <input
+            type="text"
+            placeholder="Buscar por ID, SKU o Estado..."
             className="filter-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -122,16 +122,16 @@ const OrderDashboard = () => {
                         </span>
                       </td>
                       <td className="actions-cell">
-                        <button 
-                          className="btn-icon" 
-                          onClick={() => handleEdit(order.id, order.status)} 
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleEdit(order.id, order.status)}
                           title="Editar Estado"
                         >
                           ✏️
                         </button>
-                        <button 
-                          className="btn-icon text-danger" 
-                          onClick={() => handleDelete(order.id)} 
+                        <button
+                          className="btn-icon text-danger"
+                          onClick={() => handleDelete(order.id)}
                           title="Eliminar"
                         >
                           🗑️
@@ -146,10 +146,10 @@ const OrderDashboard = () => {
         )}
       </div>
 
-      <OrderForm 
-        isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
-        onSuccess={fetchOrders} 
+      <OrderForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSuccess={fetchOrders}
       />
     </div>
   );

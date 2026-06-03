@@ -75,7 +75,7 @@ const InventoryDashboard = () => {
     }
   };
 
-  const filteredStock = stock.filter(item => 
+  const filteredStock = stock.filter(item =>
     (item.productSku && item.productSku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
@@ -84,9 +84,9 @@ const InventoryDashboard = () => {
       <div className="dashboard-header">
         <h2>Inventario Global</h2>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <input 
-            type="text" 
-            placeholder="Buscar por SKU..." 
+          <input
+            type="text"
+            placeholder="Buscar por SKU..."
             className="filter-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -119,15 +119,15 @@ const InventoryDashboard = () => {
         </div>
       ) : (
         <>
-          <InventoryTable 
-            stock={filteredStock} 
+          <InventoryTable
+            stock={filteredStock}
             selectedIds={selectedIds}
             onSelectionChange={setSelectedIds}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
-          
-          <FloatingActionBar 
+
+          <FloatingActionBar
             selectedCount={selectedIds.length}
             onClearSelection={() => setSelectedIds([])}
             actions={[
@@ -147,10 +147,10 @@ const InventoryDashboard = () => {
         </>
       )}
 
-      <InventoryForm 
-        isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
-        onSuccess={fetchStock} 
+      <InventoryForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSuccess={fetchStock}
       />
     </div>
   );

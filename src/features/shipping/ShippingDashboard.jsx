@@ -19,7 +19,7 @@ const ShippingDashboard = () => {
       setError(null);
       setFallbackMsg(null);
       const data = await ShippingService.getShipments();
-      
+
       if (data && data.status === 'FALLBACK') {
         setFallbackMsg(data.message);
         setShipments([]);
@@ -39,7 +39,7 @@ const ShippingDashboard = () => {
       setError(null);
       const orderId = window.prompt("ID del pedido a enviar:", "101");
       if (!orderId) return;
-      
+
       const newShipment = {
         orderId: parseInt(orderId),
         carrier: "FedEx",
@@ -88,8 +88,8 @@ const ShippingDashboard = () => {
     );
   }
 
-  const filteredShipments = shipments.filter(s => 
-    s.id.toString().includes(searchTerm) || 
+  const filteredShipments = shipments.filter(s =>
+    s.id.toString().includes(searchTerm) ||
     (s.carrier && s.carrier.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (s.status && s.status.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -99,9 +99,9 @@ const ShippingDashboard = () => {
       <div className="dashboard-header">
         <h2>Panel de Logística y Envíos</h2>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <input 
-            type="text" 
-            placeholder="Buscar envío..." 
+          <input
+            type="text"
+            placeholder="Buscar envío..."
             className="filter-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -140,17 +140,17 @@ const ShippingDashboard = () => {
       ) : (
         <div className="shipping-list">
           {filteredShipments.map((shipment) => (
-             <div key={shipment.id} className="shipment-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <div>
-                 <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Envío #{shipment.id} (Pedido #{shipment.orderId})</strong>
-                 <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Carrier: {shipment.carrier}</span>
-               </div>
-               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                 <span className={`status-badge status-${shipment.status.toLowerCase()}`}>{shipment.status}</span>
-                 <button className="btn-action edit" onClick={() => handleEdit(shipment.id, shipment.status)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>✏️</button>
-                 <button className="btn-action delete" onClick={() => handleDelete(shipment.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>🗑️</button>
-               </div>
-             </div>
+            <div key={shipment.id} className="shipment-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Envío #{shipment.id} (Pedido #{shipment.orderId})</strong>
+                <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Carrier: {shipment.carrier}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className={`status-badge status-${shipment.status.toLowerCase()}`}>{shipment.status}</span>
+                <button className="btn-action edit" onClick={() => handleEdit(shipment.id, shipment.status)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>✏️</button>
+                <button className="btn-action delete" onClick={() => handleDelete(shipment.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>🗑️</button>
+              </div>
+            </div>
           ))}
         </div>
       )}

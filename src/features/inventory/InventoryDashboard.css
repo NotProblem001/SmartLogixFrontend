@@ -102,11 +102,13 @@
 }
 
 .stock-value.healthy {
-  color: #34d399; /* Verde */
+  color: #34d399;
+  /* Verde */
 }
 
 .stock-value.low {
-  color: #f87171; /* Rojo */
+  color: #f87171;
+  /* Rojo */
 }
 
 .warehouse-info {
