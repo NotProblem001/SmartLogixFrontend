@@ -8,10 +8,14 @@
   --primary-color: #3b82f6;
   --primary-glow: rgba(59, 130, 246, 0.35);
   --text-main: #f8fafc;
-  --text-muted: #64748B; /* Slate Gray */
-  --accent-green: #10B981; /* Emerald Green */
-  --accent-warning: #F59E0B; /* Amber */
-  --accent-danger: #E11D48; /* Rose Red */
+  --text-muted: #64748B;
+  /* Slate Gray */
+  --accent-green: #10B981;
+  /* Emerald Green */
+  --accent-warning: #F59E0B;
+  /* Amber */
+  --accent-danger: #E11D48;
+  /* Rose Red */
 }
 
 * {
