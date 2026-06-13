@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Instancia de Axios apuntando al BFF (Spring Cloud Gateway)
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,8 +11,23 @@ const api = axios.create({
 // Interceptor de peticiones para adjuntar el JWT Token automáticamente
 api.interceptors.request.use(
   (config) => {
-    // Obtener el token del almacenamiento local (o estado global)
-    const token = localStorage.getItem('jwt_token');
+    // Obtener el token de LocalStorage de forma directa o desde el estado de Zustand si existiera
+    let token = localStorage.getItem('jwt_token');
+
+    if (!token) {
+      try {
+        // Fallback: intentar extraer el token de un store persistido de Zustand (ej. auth-storage)
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          const parsed = JSON.parse(authStorage);
+          if (parsed?.state?.token) {
+            token = parsed.state.token;
+          }
+        }
+      } catch (e) {
+        console.error('Error al intentar deserializar el almacenamiento de Zustand:', e);
+      }
+    }
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
