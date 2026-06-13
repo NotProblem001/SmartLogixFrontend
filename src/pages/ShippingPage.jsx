@@ -4,6 +4,7 @@ import { GlassPanel } from '../components/GlassPanel/GlassPanel';
 import { useApi } from '../hooks/useApi';
 import ShippingService from '../services/ShippingService';
 import { TrackingPanel } from '../components/TrackingPanel/TrackingPanel';
+import { OfflineDeliveryPanel } from '../components/OfflineDeliveryPanel/OfflineDeliveryPanel';
 
 export const ShippingPage = () => {
   const { data, loading, error, retry } = useApi(() => ShippingService.getShipments(), []);
@@ -31,6 +32,8 @@ export const ShippingPage = () => {
 
         {!loading && !error && <TrackingPanel shipments={data} />}
       </GlassPanel>
+
+      <OfflineDeliveryPanel />
     </DashboardLayout>
   );
 };
