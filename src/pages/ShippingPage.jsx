@@ -2,11 +2,11 @@ import React from 'react';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { GlassPanel } from '../components/GlassPanel/GlassPanel';
 import { useApi } from '../hooks/useApi';
-import { apiGateway } from '../services/apiGateway';
+import ShippingService from '../services/ShippingService';
 import { TrackingPanel } from '../components/TrackingPanel/TrackingPanel';
 
 export const ShippingPage = () => {
-  const { data, loading, error, retry } = useApi(() => apiGateway.call('/shipping/tracking'), []);
+  const { data, loading, error, retry } = useApi(() => ShippingService.getShipments(), []);
 
   return (
     <DashboardLayout title="Envíos">

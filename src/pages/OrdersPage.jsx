@@ -2,10 +2,10 @@ import React from 'react';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { GlassPanel } from '../components/GlassPanel/GlassPanel';
 import { useApi } from '../hooks/useApi';
-import { apiGateway } from '../services/apiGateway';
+import OrderService from '../services/OrderService';
 
 export const OrdersPage = () => {
-  const { data, loading, error, retry } = useApi(() => apiGateway.call('/orders/lifecycle'), []);
+  const { data, loading, error, retry } = useApi(() => OrderService.getAllOrders(), []);
 
   return (
     <DashboardLayout title="Pedidos">
@@ -35,21 +35,28 @@ export const OrdersPage = () => {
                 <tr>
                   <th>Orden</th>
                   <th>Cliente</th>
-                  <th>Etapa</th>
+                  <th>Etapa / Producto</th>
                   <th>ETA</th>
                   <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
-                {data?.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{order.customer}</td>
-                    <td>{order.stage}</td>
-                    <td>{order.eta}</td>
-                    <td>{order.status}</td>
-                  </tr>
-                ))}
+                {data?.map((order) => {
+                  const orderId = order.id;
+                  const client = order.customerId || order.customer || 'N/A';
+                  const stageOrSku = order.sku ? `${order.sku} (Cant: ${order.quantity})` : (order.stage || 'N/A');
+                  const eta = order.eta || 'Automático';
+                  const status = order.status || 'N/A';
+                  return (
+                    <tr key={orderId}>
+                      <td>{orderId}</td>
+                      <td>{client}</td>
+                      <td>{stageOrSku}</td>
+                      <td>{eta}</td>
+                      <td>{status}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

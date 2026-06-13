@@ -2,10 +2,10 @@ import React from 'react';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { GlassPanel } from '../components/GlassPanel/GlassPanel';
 import { useApi } from '../hooks/useApi';
-import { apiGateway } from '../services/apiGateway';
+import InventoryService from '../services/InventoryService';
 
 export const InventoryPage = () => {
-  const { data, loading, error, retry } = useApi(() => apiGateway.call('/inventory/sync'), []);
+  const { data, loading, error, retry } = useApi(() => InventoryService.getSyncedStock(), []);
 
   return (
     <DashboardLayout title="Inventario">
@@ -40,14 +40,21 @@ export const InventoryPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {data?.map((row) => (
-                  <tr key={`${row.warehouse}-${row.sku}`}>
-                    <td>{row.warehouse}</td>
-                    <td>{row.sku}</td>
-                    <td>{row.stock}</td>
-                    <td>{row.status}</td>
-                  </tr>
-                ))}
+                {data?.map((row) => {
+                  const warehouseName = row.warehouse?.name || row.warehouse || 'N/A';
+                  const sku = row.productSku || row.sku || 'N/A';
+                  const stock = row.availableQuantity !== undefined ? row.availableQuantity : row.stock;
+                  const status = row.availableQuantity !== undefined ? (row.availableQuantity < 20 ? 'Crítico' : 'Normal') : row.status;
+                  const key = row.id || `${warehouseName}-${sku}`;
+                  return (
+                    <tr key={key}>
+                      <td>{warehouseName}</td>
+                      <td>{sku}</td>
+                      <td>{stock}</td>
+                      <td>{status}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
