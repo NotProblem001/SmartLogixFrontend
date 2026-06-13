@@ -11,6 +11,7 @@ export const OfflineDeliveryPanel = () => {
   const [queue, setQueue] = useState([]);
   const [statusMsg, setStatusMsg] = useState(null);
   const [statusType, setStatusType] = useState('neutral'); // neutral, positive, warning, error
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Load offline queue on mount
   useEffect(() => {
@@ -43,54 +44,75 @@ export const OfflineDeliveryPanel = () => {
   }, [isOnline]);
 
   const syncOfflineQueue = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
     setStatusMsg('Sincronizando transacciones encoladas...');
     setStatusType('warning');
 
-    const currentQueue = [...queue];
-    const failedItems = [];
-    let successCount = 0;
+    try {
+      const currentQueue = [...queue];
+      const failedItems = [];
+      let successCount = 0;
 
-    for (const item of currentQueue) {
-      try {
-        // Prepare backend request structure matching Shipment entity
-        await ShippingService.createShipment({
-          orderId: item.orderId,
-          carrier: item.carrier,
-          status: item.status
-        });
-        successCount++;
-      } catch (error) {
-        console.error('Error syncing item', item, error);
-        failedItems.push(item);
+      for (const item of currentQueue) {
+        try {
+          // Prepare backend request structure matching Shipment entity
+          await ShippingService.createShipment({
+            orderId: item.orderId,
+            carrier: item.carrier,
+            status: item.status
+          });
+          successCount++;
+        } catch (error) {
+          console.error('Error syncing item', item, error);
+          failedItems.push(item);
+        }
       }
-    }
 
-    localStorage.setItem('offline_eft_queue', JSON.stringify(failedItems));
-    setQueue(failedItems);
+      localStorage.setItem('offline_eft_queue', JSON.stringify(failedItems));
+      setQueue(failedItems);
 
-    if (successCount > 0) {
-      setStatusMsg(`¡Conexión restaurada! Se sincronizaron exitosamente ${successCount} transacciones contables EFT.`);
-      setStatusType('positive');
-    } else if (failedItems.length > 0) {
-      setStatusMsg('Fallo al sincronizar algunas transacciones de la cola.');
-      setStatusType('error');
+      if (successCount > 0) {
+        setStatusMsg(`¡Conexión restaurada! Se sincronizaron exitosamente ${successCount} transacciones contables EFT.`);
+        setStatusType('positive');
+      } else if (failedItems.length > 0) {
+        setStatusMsg('Fallo al sincronizar algunas transacciones de la cola.');
+        setStatusType('error');
+      }
+    } catch (e) {
+      console.error('Sync process failed', e);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!orderId) {
-      setStatusMsg('Por favor ingrese un ID de Orden válido');
+
+    const orderIdClean = orderId.trim();
+    const amountClean = amount.trim();
+
+    if (!orderIdClean || !/^\d+$/.test(orderIdClean)) {
+      setStatusMsg('Por favor ingrese un ID de Orden numérico válido');
       setStatusType('error');
       return;
     }
 
+    if (!amountClean || isNaN(parseFloat(amountClean)) || parseFloat(amountClean) <= 0) {
+      setStatusMsg('Por favor ingrese un monto EFT numérico válido y mayor a cero');
+      setStatusType('error');
+      return;
+    }
+
+    const parsedOrderId = parseInt(orderIdClean, 10);
+    const parsedAmount = parseFloat(amountClean);
+
     const shipmentPayload = {
       id_temp: Date.now(),
-      orderId: parseInt(orderId),
+      orderId: parsedOrderId,
       carrier,
       status: 'DESPACHADO',
-      amount: parseFloat(amount),
+      amount: parsedAmount,
       signature,
       timestamp: new Date().toISOString()
     };
@@ -104,7 +126,7 @@ export const OfflineDeliveryPanel = () => {
           carrier: shipmentPayload.carrier,
           status: shipmentPayload.status
         });
-        setStatusMsg(`Envío procesado exitosamente para la Orden #${orderId}. Cobro EFT realizado.`);
+        setStatusMsg(`Envío procesado exitosamente para la Orden #${orderIdClean}. Cobro EFT realizado.`);
         setStatusType('positive');
         setOrderId('');
       } catch (error) {
@@ -115,7 +137,7 @@ export const OfflineDeliveryPanel = () => {
       const updatedQueue = [...queue, shipmentPayload];
       localStorage.setItem('offline_eft_queue', JSON.stringify(updatedQueue));
       setQueue(updatedQueue);
-      setStatusMsg(`Sin conexión. Envío de la Orden #${orderId} guardado localmente en caché.`);
+      setStatusMsg(`Sin conexión. Envío de la Orden #${orderIdClean} guardado localmente en caché.`);
       setStatusType('warning');
       setOrderId('');
     }
@@ -167,7 +189,7 @@ export const OfflineDeliveryPanel = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>ID de la Orden *</label>
               <input
-                type="number"
+                type="text"
                 placeholder="Ej. 1024"
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
@@ -204,7 +226,7 @@ export const OfflineDeliveryPanel = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Monto EFT ($USD)</label>
               <input
-                type="number"
+                type="text"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 style={{
@@ -233,17 +255,21 @@ export const OfflineDeliveryPanel = () => {
             </div>
           </div>
 
-          <button type="submit" className="primary-button" style={{
+          <button type="submit" disabled={isSyncing} className="primary-button" style={{
             padding: '0.85rem',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: isSyncing 
+              ? 'rgba(255, 255, 255, 0.1)' 
+              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
             border: 'none',
-            color: 'white',
+            color: isSyncing ? 'var(--text-muted)' : 'white',
             borderRadius: '6px',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: isSyncing ? 'not-allowed' : 'pointer',
             marginTop: '0.5rem'
           }}>
-            {isOnline ? 'Finalizar Entrega y Cobrar EFT' : 'Guardar en Cola Local (Offline)'}
+            {isSyncing 
+              ? 'Sincronizando...' 
+              : (isOnline ? 'Finalizar Entrega y Cobrar EFT' : 'Guardar en Cola Local (Offline)')}
           </button>
         </form>
       </GlassPanel>
