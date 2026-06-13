@@ -5,13 +5,8 @@
   --surface-color: rgba(30, 41, 59, 0.72);
   --surface-strong: rgba(15, 23, 42, 0.96);
   --border-color: rgba(255, 255, 255, 0.1);
-<<<<<<< HEAD
   --primary-color: #3b82f6;
   --primary-glow: rgba(59, 130, 246, 0.35);
-=======
-  --primary-color: #1E3A8A; /* Deep Blue */
-  --primary-glow: rgba(30, 58, 138, 0.5);
->>>>>>> main
   --text-main: #f8fafc;
   --text-muted: #64748B; /* Slate Gray */
   --accent-green: #10B981; /* Emerald Green */
@@ -251,7 +246,6 @@ a {
   font-size: 0.95rem;
 }
 
-<<<<<<< HEAD
 .trend-up {
   color: var(--accent-green);
 }
@@ -505,9 +499,6 @@ td {
     padding: 1.5rem;
   }
 }
-=======
-.trend-up { color: var(--accent-green); }
-.trend-down { color: #ef4444; }
 
 /* Accesibilidad (A11y) */
 .sr-only {
@@ -526,4 +517,3 @@ td {
   outline: 2px solid var(--accent-green);
   outline-offset: 2px;
 }
->>>>>>> main

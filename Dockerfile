@@ -13,6 +13,8 @@ RUN pnpm install --frozen-lockfile
 
 # Copiar el código fuente y compilar
 COPY . .
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm run build
 
 # Stage 2: Runtime
