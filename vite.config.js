@@ -7,6 +7,20 @@ export default defineConfig(() => {
   
   const config = {
     plugins: [react()],
+    test: {
+      environment: 'jsdom',
+      globals: true,
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'html'],
+        thresholds: {
+          lines: 60,
+          functions: 60,
+          branches: 60,
+          statements: 60
+        }
+      }
+    }
   };
 
   if (isLib) {

@@ -76,14 +76,19 @@ Para compilar y testear los microservicios sin docker utilizando el wrapper de M
 $env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.5" # Windows PowerShell
 # Compilar y ejecutar pruebas de todo el proyecto
 ./mvnw clean test
+
+#Instalar dependencias del proyecto y vitest para ejecutar pruebas front-end
+npm install -D vitest @vitest/coverage-v8 jsdom @testing-library/react @testing-library/jest-dom --legacy-peer-deps
+
+cmd /c npm audit
 ```
 
 #### 3. Levantar el Servidor de Desarrollo del Frontend
 Navegue al directorio del frontend, instale las dependencias e inicie el servidor de desarrollo Vite:
 ```bash
 cd ../SmartLogixFrontend
-pnpm install
-pnpm run dev
+cmd /c npm install
+npm run dev
 ```
 > La aplicación web estará disponible localmente en `http://localhost:5173`.
 

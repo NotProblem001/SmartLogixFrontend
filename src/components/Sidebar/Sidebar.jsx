@@ -16,13 +16,14 @@ export const Sidebar = ({ navItems, collapsed, onToggle }) => {
       </div>
 
       <nav className="nav-links">
-        {navItems.map(({ label, path }) => (
+        {navItems.map(({ label, path, icon }) => (
           <NavLink
             key={path}
             to={path}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
-            <span>{label}</span>
+            <span style={{ marginRight: '8px' }}>{icon}</span>
+            {!collapsed && <span>{label}</span>}
           </NavLink>
         ))}
       </nav>
