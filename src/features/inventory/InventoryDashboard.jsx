@@ -83,19 +83,23 @@ const InventoryDashboard = () => {
     <div className="inventory-dashboard glass-panel">
       <div className="dashboard-header">
         <h2>Inventario Global</h2>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <input
-            type="text"
-            placeholder="Buscar por SKU..."
-            className="filter-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="btn-primary" onClick={() => setIsFormOpen(true)}>
-            + Añadir
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="search-bar-wrapper" style={{ position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Buscar por SKU..."
+              className="filter-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: '35px', width: '250px' }}
+            />
+          </div>
+          <button className="btn-primary" onClick={() => setIsFormOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>➕</span> Registrar Producto
           </button>
-          <button className="btn-secondary" onClick={fetchStock}>
-            ↻ Sincronizar
+          <button className="btn-secondary" onClick={fetchStock} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>↻</span> Recargar
           </button>
         </div>
       </div>

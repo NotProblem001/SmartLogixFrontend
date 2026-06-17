@@ -61,15 +61,22 @@ const OrderDashboard = () => {
       <header className="order-header">
         <h2>Panel de Pedidos</h2>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <input
-            type="text"
-            placeholder="Buscar por ID, SKU o Estado..."
-            className="filter-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="btn-primary" onClick={() => setIsFormOpen(true)}>
-            + Crear Pedido Manual
+          <div className="search-bar-wrapper" style={{ position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Buscar por ID, SKU o Estado..."
+              className="filter-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: '35px', width: '250px' }}
+            />
+          </div>
+          <button className="btn-primary" onClick={() => setIsFormOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>➕</span> Crear Pedido
+          </button>
+          <button className="btn-secondary" onClick={fetchOrders} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>↻</span> Recargar
           </button>
         </div>
       </header>

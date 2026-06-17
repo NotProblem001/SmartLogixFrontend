@@ -79,7 +79,7 @@ $env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.5" # Windows PowerShell
 
 #Instalar dependencias del proyecto y vitest para ejecutar pruebas front-end
 npm install -D vitest @vitest/coverage-v8 jsdom @testing-library/react @testing-library/jest-dom --legacy-peer-deps
-
+cmd /c npm audit fix --force
 cmd /c npm audit
 ```
 
