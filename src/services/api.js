@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl}/api/v1`;
+  // Solución dinámica sin variables de entorno:
+  // Si el navegador está en localhost, usamos el Gateway local
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8085/api/v1';
   }
-  return 'http://localhost:8085/api/v1';
+  // Si estamos en cualquier otro dominio (como Vercel), usamos directamente Render
+  return 'https://bff-gateway-3e0x.onrender.com/api/v1';
 };
 
 const api = axios.create({
